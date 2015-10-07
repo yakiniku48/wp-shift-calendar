@@ -1,0 +1,33 @@
+.wrap .tablenav,
+.wrap .search-box {
+	display: none;
+}
+
+.row-actions .inline {
+	display: none;
+}
+
+#wp-shift-calendar.postbox {
+	border: none;
+	background: transparent;
+	box-shadow: none;
+}
+#wp-shift-calendar.postbox .handlediv,
+#wp-shift-calendar.postbox h3 {
+	display: none;
+}
+#wp-shift-calendar.postbox .inside {
+	padding: 0 0 12px;
+}
+table.wp-shift-calendar.widefat tbody {
+	padding: 10px;
+}
+table.wp-shift-calendar.widefat th,
+table.wp-shift-calendar.widefat td {
+	border-bottom: 1px solid #ddd;
+}
+table.wp-shift-calendar.widefat td input[type=button] {
+	padding: 0;
+	width: 4em;
+	overflow: hidden;
+}
