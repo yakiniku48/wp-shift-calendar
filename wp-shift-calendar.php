@@ -13,12 +13,12 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 	define( 'SCAL_SLUG', 'wp-shift-calendar' );
 	define( 'SCAL_SLUG_TIME', SCAL_SLUG . '-time' );
 	define( 'SCAL_SLUG_PERSONS', SCAL_SLUG . '-persons' );
+	define( 'SCAL_SLUG_SHORTCODE', SCAL_SLUG . '-shortcode' );
 	define( 'SCAL_DIR_URL', plugin_dir_url( __FILE__ ) );
 	define( 'SCAL_DIR_PATH', plugin_dir_path( __FILE__ ) );
 	
 	class Shift_Calendar {
 		
-		var $settings;
 		var $base_date;
 		var $arr_time;
 		var $arr_persons;
@@ -43,7 +43,6 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 				'public' => false,
 				'show_ui' => true,
 				'capability_type' => 'page',
-				'hierarchical' => true,
 				'menu_icon' => 'dashicons-calendar-alt',
 				'rewrite' => false,
 				'query_var' => SCAL_SLUG,
@@ -83,7 +82,7 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 			add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 			
-			add_shortcode( SCAL_SLUG, array( $this, 'shortcode' ));
+			//add_shortcode( SCAL_SLUG, array( $this, 'shortcode' ));
 		}
 		function current_screen() {
 			$current_screen = get_current_screen();
@@ -97,7 +96,8 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			remove_meta_box( 'slugdiv', SCAL_SLUG, 'normal' );
 		}
 		function admin_head() {
-			//
+			add_filter( 'manage_edit-' . SCAL_SLUG . '_columns', array( $this, 'manage_posts_custom_columns' ) );
+			add_action( 'manage_posts_custom_column', array( $this, 'manage_posts_custom_column' ), 10, 2 );
 		}
 		function wp_enqueue_scripts() {
 			wp_enqueue_style(  SCAL_SLUG, SCAL_DIR_URL . 'css/' . SCAL_SLUG . '.css' );
@@ -209,6 +209,16 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			$buffer = ob_get_contents();
 			ob_end_clean();
 			return $buffer;
+		}
+		
+		function manage_posts_custom_column( $column_name, $post_id ) {
+			if ( $column_name == SCAL_SLUG_SHORTCODE ) {
+				echo '<input type="text" value="'. esc_attr( '[wp-shift-calendar id="' . get_the_ID() . '" months="3" begin="4"]' ) . '">';
+			}
+		}
+		function manage_posts_custom_columns( $columns ) {
+			$columns[ SCAL_SLUG_SHORTCODE ] = 'ショートコード';
+			return $columns;
 		}
 		
 		//helper
