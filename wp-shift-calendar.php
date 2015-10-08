@@ -82,8 +82,29 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 			add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 			
+			add_filter('post_updated_messages', array( $this, 'post_updated_messages' ) );
+
 			add_shortcode( SCAL_SLUG, array( $this, 'shortcode' ));
 		}
+		
+		function post_updated_messages( $messages ) {
+			$messages[ SCAL_SLUG ] = array(
+				0 => '', // Unused. Messages start at index 1.
+				1 => 'カレンダーを更新しました',
+				2 => 'カスタムフィールドを更新しました',
+				3 => 'カスタムフィールドを削除しました',
+				4 => 'カレンダーを更新しました',
+				/* translators: %s: date and time of the revision */
+				5 => isset($_GET['revision']) ? sprintf( ' %s 前にカレンダーを保存しました', wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+				6 => 'カレンダーを公開しました',
+				7 => 'カレンダーを保存',
+				8 => 'カレンダーを送信',
+				9 => 'カレンダーを予約投稿しました',
+				10 => 'カレンダーの下書きを更新しました',
+			);
+			return $messages;
+		}
+		
 		function current_screen() {
 			$current_screen = get_current_screen();
 			if ( SCAL_SLUG == $current_screen->post_type ) {

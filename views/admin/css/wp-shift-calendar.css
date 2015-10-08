@@ -31,3 +31,9 @@ table.wp-shift-calendar.widefat td input[type=button] {
 	width: 4em;
 	overflow: hidden;
 }
+
+#minor-publishing-actions,
+#misc-publishing-actions #visibility,
+#misc-publishing-actions .curtime {
+	display: none;
+}
