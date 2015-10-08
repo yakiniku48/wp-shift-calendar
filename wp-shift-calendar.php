@@ -54,7 +54,11 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			));
 
 			register_taxonomy( SCAL_SLUG_TIME, SCAL_SLUG, array(
-				'label' => '日割りの時間帯',
+				'labels' => array(
+					'name' => '日割りの時間帯',
+					'add_new_item' => '新規日割りの時間帯追加',
+					'edit_item' => '日割りの時間帯の編集',
+				),
 				'public' => true,
 				'show_ui' => true,
 				'hierarchical' => false,
@@ -62,7 +66,11 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			) );
 
 			register_taxonomy( SCAL_SLUG_PERSONS, SCAL_SLUG, array(
-				'label' => '担当・営業種別',
+				'labels' => array(
+					'name' => '担当・営業種別',
+					'add_new_item' => '新規担当・営業種別追加',
+					'edit_item' => '担当・営業種別の編集',
+				),
 				'public' => true,
 				'show_ui' => true,
 				'hierarchical' => false,
@@ -85,19 +93,8 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			}
 		}
 		function admin_init() {
-			$this->get_taxonomies();
-
-			$this->settings = array(
-				'list_time' => $this->list_time,
-				'list_persons' => $this->list_persons,
-				'arr_time' => $this->arr_time,
-				'arr_persons' => $this->arr_persons,
-			);
 			add_action( 'save_post_' . SCAL_SLUG, array( $this, 'save_post' ) );
-
 			remove_meta_box( 'slugdiv', SCAL_SLUG, 'normal' );
-			remove_meta_box( 'tagsdiv-' . SCAL_SLUG_TIME, SCAL_SLUG, 'normal' );
-			remove_meta_box( 'tagsdiv-' . SCAL_SLUG_PERSONS, SCAL_SLUG, 'normal' );
 		}
 		function admin_head() {
 			//
@@ -107,13 +104,18 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			wp_enqueue_script( SCAL_SLUG, SCAL_DIR_URL . 'js/' . SCAL_SLUG . '.js', array( 'jquery' ) );
 		}
 		function add_meta_boxes() {
-			add_meta_box( SCAL_SLUG, 'Calendar', array( $this, 'create_meta_box' ), SCAL_SLUG, 'normal' );
+			$this->get_taxonomies();
+			add_meta_box( SCAL_SLUG, 'Calendar', array( $this, 'create_meta_box_normal' ), SCAL_SLUG, 'normal' );
+			add_meta_box( SCAL_SLUG . '-caution', '更新に関しての注意', array( $this, 'create_meta_box_side' ), SCAL_SLUG, 'side', 'high' );
 		}
 		
-		function create_meta_box() {
+		function create_meta_box_normal() {
 			global $post;
 			$meta_data = reset( get_post_meta( $post->ID, SCAL_SLUG, false ) );
-			include( SCAL_DIR_PATH . 'views/admin/meta_box.php' );
+			include( SCAL_DIR_PATH . 'views/admin/meta_box_normal.php' );
+		}
+		function create_meta_box_side() {
+			include( SCAL_DIR_PATH . 'views/admin/meta_box_side.php' );
 		}
 		function save_post( $post_id ) {
 			if ( !isset( $_POST[ SCAL_SLUG ] ) ) {
@@ -131,7 +133,7 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 				foreach ( $meta_data[ 'admin_data' ] as $ymd => $shifts ) {
 					foreach ( $shifts as $time => $shift ) {
 						if ( !$shift ) continue;
-						$meta_data[ 'front_data' ][ $ymd ][ $this->settings[ 'arr_time' ][ $time ]->name ] = $this->settings[ 'arr_persons' ][ $shift ]->name;
+						$meta_data[ 'front_data' ][ $ymd ][ $this->arr_time[ $time ]->name ] = $this->arr_persons[ $shift ]->name;
 					}
 				}
 				update_post_meta( $post_id, SCAL_SLUG, $meta_data );
@@ -186,7 +188,7 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			<td class="scal-day-<?php echo esc_attr( $d ) ?> scal-week-<?php echo esc_attr( $this_weekday ); ?>">
 				<em class="scal-day"><?php echo esc_html($d); ?></em>
 <?php				foreach ( $meta_data[ 'time' ] as $time ) : $person = $meta_data[ 'front_data' ][ date( 'Y-m-d', $this_day ) ][ $time ]; ?>
-				<div class="scal-time-<?php echo esc_attr( $meta_data[ 'time2term_id' ][ $time ] ); ?> scal-person-<?php echo esc_attr( $meta_data[ 'person2term_id' ][ $person ] ); ?>"><i><?php echo esc_html( $time ); ?></i> <?php echo esc_html( $person ); ?></div>
+				<div class="scal-time-<?php echo esc_attr( $meta_data[ 'time2term_id' ][ $time ] ); ?> scal-person-<?php echo esc_attr( $meta_data[ 'person2term_id' ][ $person ] ); ?>"><?php if ( count( $meta_data[ 'time' ] ) > 1 ) : ?><i><?php echo esc_html( $time ); ?></i> <?php endif; ?><?php echo esc_html( $person ); ?></div>
 <?php				endforeach; ?>
 			</td>
 
@@ -211,13 +213,11 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 		
 		//helper
 		function get_taxonomies() {
-			$arr_time_tmp = get_categories( array( 'hide_empty' => 0, 'taxonomy' => SCAL_SLUG_TIME ) );
-			if ( empty( $arr_time_tmp ) ) $arr_time_tmp[] = (object) array( 'term_id' => 'default', 'name' => '終日' );
+			$arr_time_tmp = wp_get_post_terms( get_the_ID(), SCAL_SLUG_TIME );
 			$this->arr_time = array();
 			foreach ( $arr_time_tmp as $data ) $this->arr_time[ $data->term_id ] = $data;
 
-			$arr_persons_tmp = get_categories( array( 'hide_empty' => 0, 'taxonomy' => SCAL_SLUG_PERSONS ) );
-			if ( empty( $arr_persons_tmp ) ) $arr_persons_tmp[] = (object) array( 'term_id' => 'default', 'name' => '休み' );
+			$arr_persons_tmp = wp_get_post_terms( get_the_ID(), SCAL_SLUG_PERSONS );
 			$this->arr_persons = array();
 			foreach ( $arr_persons_tmp as $data ) $this->arr_persons[ $data->term_id ] = $data;
 			
