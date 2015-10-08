@@ -213,7 +213,7 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 		
 		function manage_posts_custom_column( $column_name, $post_id ) {
 			if ( $column_name == SCAL_SLUG_SHORTCODE ) {
-				echo '<input type="text" value="'. esc_attr( '[wp-shift-calendar id="' . get_the_ID() . '" months="3" begin="4"]' ) . '">';
+				echo '<input type="text" value="'. esc_attr( '[wp-shift-calendar id="' . get_the_ID() . '" months="3" begin="0"]' ) . '">';
 			}
 		}
 		function manage_posts_custom_columns( $columns ) {
