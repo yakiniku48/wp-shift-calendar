@@ -82,7 +82,7 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 			add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 			add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 			
-			//add_shortcode( SCAL_SLUG, array( $this, 'shortcode' ));
+			add_shortcode( SCAL_SLUG, array( $this, 'shortcode' ));
 		}
 		function current_screen() {
 			$current_screen = get_current_screen();
