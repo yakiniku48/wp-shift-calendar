@@ -31,6 +31,12 @@ table.wp-shift-calendar.widefat td input[type=button] {
 	width: 4em;
 	overflow: hidden;
 }
+table.wp-shift-calendar.widefat td.weekday_sat {
+	background-color: #0073aa;
+}
+table.wp-shift-calendar.widefat td.weekday_sun {
+	background-color: #d54221;
+}
 
 #minor-publishing-actions,
 #misc-publishing-actions #visibility,

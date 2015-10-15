@@ -18,7 +18,11 @@
 <?php				endif; ?>
 				<th><?php echo $time->name; ?></th>
 <?php				for ( $j = 0; $j < 6; $j++ ) : $m = $j + 1; $this_time = strtotime( "+{$i} day +{$j} month", $this->base_date ); ?>
-				<td>
+<?php					$td_class = '';
+						if ( date( 'w', $this_time ) == 0 ) $td_class = 'weekday_sun';
+						if ( date( 'w', $this_time ) == 6 ) $td_class = 'weekday_sat';
+?>
+				<td class="<?php echo $td_class; ?>">
 <?php					if ( $arr_month[ $j ] == date( 'n', $this_time ) ) : $term_id = $meta_data[ 'admin_data' ][ date( 'Y-m-d', $this_time ) ][ $time->term_id ]; ?>
 					<input type="button" class="button btn-shift-calendar" data-id="0" value="<?php echo ( $this->list_persons[ $term_id ] ) ? $this->list_persons[ $term_id ] : '--'; ?>">
 					<input type="hidden" name="<?php echo SCAL_SLUG; ?>[<?php echo date( 'Y-m-d', $this_time ); ?>][<?php echo $time->term_id; ?>]" value="<?php echo $term_id; ?>">

@@ -195,9 +195,9 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 	<tbody>
 		<tr>
 <?php	$pad = calendar_week_mod( date( 'w', $this_month ) - $atts[ 'begin' ] ); ?>
-<?php			if ( $pad != 0 ) : ?>
-			<td colspan="<?php echo esc_attr( $pad ) ?>" class="scal-pad"></td>
-<?php			endif; ?>
+<?php			if ( $pad != 0 ) for ( $p = 0; $p < $pad; $p++) : ?>
+			<td class="scal-pad"></td>
+<?php			endfor; ?>
 
 <?php			for ( $d = 1; $d <= date( 't', $this_month ); $d++ ) : ?>
 <?php				$this_day = strtotime( '+' . ( $d - 1 ) . 'day', $this_month ); ?>
@@ -208,18 +208,20 @@ if ( ! class_exists( 'Shift_Calendar' ) ) {
 <?php				endif ?>
 			<td class="scal-day-<?php echo esc_attr( $d ) ?> scal-week-<?php echo esc_attr( $this_weekday ); ?>">
 				<em class="scal-day"><?php echo esc_html($d); ?></em>
+				<div class="scal-body scal-body-<?php echo esc_attr( $d ) ?>">
 <?php				foreach ( $meta_data[ 'time' ] as $time ) : $person = $meta_data[ 'front_data' ][ date( 'Y-m-d', $this_day ) ][ $time ]; ?>
-				<div class="scal-time-<?php echo esc_attr( $meta_data[ 'time2term_id' ][ $time ] ); ?> scal-person-<?php echo esc_attr( $meta_data[ 'person2term_id' ][ $person ] ); ?>"><?php if ( count( $meta_data[ 'time' ] ) > 1 ) : ?><i><?php echo esc_html( $time ); ?></i> <?php endif; ?><?php echo esc_html( $person ); ?></div>
+					<div class="scal-time-<?php echo esc_attr( $meta_data[ 'time2term_id' ][ $time ] ); ?> scal-person-<?php echo esc_attr( $meta_data[ 'person2term_id' ][ $person ] ); ?>"><?php if ( count( $meta_data[ 'time' ] ) > 1 ) : ?><i><?php echo esc_html( $time ); ?></i> <?php endif; ?><?php echo esc_html( $person ); ?></div>
 <?php				endforeach; ?>
+				</div>
 			</td>
 
 <?php				if ( calendar_week_mod( date( 'w', mktime(0, 0, 0, date( 'n', $this_month ), $d, date( 'Y', $this_month) ) ) - $atts[ 'begin' ] ) == 6 ) $break = true; ?>
 <?php			endfor ?>
 			
 <?php			$pad = 7 - calendar_week_mod( date( 'w', mktime( 0, 0, 0, date( 'n', $this_month ), $d, date( 'Y', $this_month) ) ) - $atts[ 'begin' ] ); ?>
-<?php			if ( $pad != 0 && $pad != 7 ) : ?>
-			<td colspan="<?php echo esc_attr( $pad ) ?>" class="scal-pad"></td>
-<?php			endif ?>
+<?php			if ( $pad != 0 && $pad != 7 )  for ( $p = 0; $p < $pad; $p++) : ?>
+			<td class="scal-pad"></td>
+<?php			endfor; ?>
 		</tr>
 	</tbody>
 </table>
